@@ -37,3 +37,4 @@ obj-$(CONFIG_FB_TFT_UC1701)      += fb_uc1701.o
 obj-$(CONFIG_FB_TFT_UPD161704)   += fb_upd161704.o
 obj-$(CONFIG_FB_TFT_WATTEROTT)   += fb_watterott.o
 obj-$(CONFIG_FB_TFT_GC9107)      += fb_gc9107.o
+obj-$(CONFIG_FB_TFT_GC9307)      += fb_gc9307.o

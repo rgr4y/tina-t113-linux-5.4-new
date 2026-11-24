@@ -205,3 +205,9 @@ config FB_TFT_GC9107
 	depends on FB_TFT
 	help
 	  Generic Framebuffer support for GC9107
+
+config FB_TFT_GC9307
+	tristate "FB driver for the GC9307 LCD Controller"
+	depends on FB_TFT
+	help
+	  Generic Framebuffer support for GC9307
