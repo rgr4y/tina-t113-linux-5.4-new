@@ -19,3 +19,19 @@
 - Panels: `compatible = "syk,gc9107"` / `"syk,gc9307"` on spi0/spi1 with `dc-gpios`, 75 MHz, 60 fps, buswidth 8.
 - Raw dumps kept outside the repo in `~/workspace/waveshare-mk10/dts/`: `boot-mmcblk0p4.img` (vendor zImage + ramdisk), `mmcblk0-head-41464s.bin` (everything before p1: boot0, boot_package).
 - Decompiled DTS has raw phandles. It compiles standalone, it is not yet a proper `sun8iw20p1.dtsi` include.
+
+## 2026-11-24 — add-on modules for the vendor kernel
+
+- Outcome: `mk10/build-modules.sh` builds 35 modules for the running vendor kernel (`5.4.61 SMP preempt mod_unload ARMv7 p2v8`) into `~/workspace/waveshare-mk10/out/mk10-modules-5.4.61.tgz` (`lib/modules/5.4.61/extra/`). Inputs: `mk10/running-5.4.61-334.config` + `mk10/modules.fragment`.
+  - USB gadget: `usb_f_ncm`, `usb_f_ecm`, `usb_f_ecm_subset` (+ legacy `g_ncm`/`g_ether`). Built via `USB_G_NCM=m`/`USB_ETH=m` because `USB_CONFIGFS_NCM/ECM` are bools that would force `=y`. RNDIS is already builtin.
+  - USB host ethernet: `usbnet cdc_ether cdc_ncm cdc_subset rndis_host r8152 asix ax88179_178a` (+ `net1080 zaurus` pulled in by cdc_subset).
+  - Tailscale: `tun`, `iptable_nat iptable_raw xt_nat xt_MASQUERADE xt_addrtype`, `ip6_tables ip6table_{filter,mangle,raw,nat} nf_reject_ipv6`, `nf_log_*`. Policy routing (`IP_MULTIPLE_TABLES`, `IPV6_MULTIPLE_TABLES`) is already builtin.
+  - `nf_nat_masquerade.ko` (out-of-tree, `oot/nf_nat_masquerade`): vendor `nf_nat=y` was built without `NF_NAT_MASQUERADE`, so `xt_MASQUERADE` needs the helpers as a separate module.
+  - zram: `zsmalloc`, `zram`. Block device only — vendor kernel has `CONFIG_SWAP=n` (core mm, not modular), so no zram swap without a new kernel.
+  - Realtek wifi: `8821cu`, `88x2bu` (morrownr copies in `oot/`). The script widens their `MODULE_IMPORT_NS(VFS_internal...)` guard from >=5.10 to >=5.4; this vendor 5.4 enforces symbol namespaces.
+- Root causes hit:
+  - vermagic `5.4.61+`: setlocalversion appends `+` for a non-tag tree. Script touches `.scmversion`.
+  - `GCC_PLUGINS` probe failed with GCC 11 headers (fixed in previous commit). Without per-task SSP, modules reference `__stack_chk_guard`, which the vendor kernel lacks.
+- Guard: the script fails if the merged config changes any builtin `=y` vs the running config (allow-list: bools that only affect module code).
+- Verification on 10.0.1.48 (loaded from /tmp, then all unloaded, nothing installed): 27 modules insmod clean, no unknown symbols, taint only `O`. `ip tuntap` creates tun; zram0 sized 32M (lzo-rle); MASQUERADE rule added/removed in v4 and v6 nat; `ncm`/`ecm` function dirs created in configfs gadget g1 and removed. Static check: every undefined symbol in every module resolves to our vmlinux exports, and all function symbols exist in device `/proc/kallsyms` (data symbols not visible: `KALLSYMS_ALL=n`).
+- Not done: modules not installed into the device rootfs; no NCM link tested against a host; Realtek dongles not plugged in.
