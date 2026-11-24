@@ -53,5 +53,7 @@ for f in "$X"/*.ko; do
   vm=vermagic=$(/sbin/modinfo -F vermagic "$f")
   [ "$vm" = "vermagic=$KVER SMP preempt mod_unload ARMv7 p2v8 " ] || { echo "bad $vm in $f"; exit 1; }
 done
+# vendor rootfs lacks these; without them depmod writes an empty modules.builtin.bin and "modprobe <builtin>" fails
+cp modules.builtin modules.builtin.modinfo "$OUT/stage/lib/modules/$KVER/"
 tar -C "$OUT/stage" -czf "$OUT/mk10-modules-$KVER.tgz" lib
 log "done: $OUT/mk10-modules-$KVER.tgz ($(ls "$X" | wc -l) modules, vendor-shipped skipped: $VENDOR)"
