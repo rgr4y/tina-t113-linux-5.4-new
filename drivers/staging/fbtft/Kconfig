@@ -199,3 +199,9 @@ config FB_TFT_WATTEROTT
 	depends on FB_TFT
 	help
 	  Generic Framebuffer support for WATTEROTT
+
+config FB_TFT_GC9107
+	tristate "FB driver for the GC9107 LCD Controller"
+	depends on FB_TFT
+	help
+	  Generic Framebuffer support for GC9107
