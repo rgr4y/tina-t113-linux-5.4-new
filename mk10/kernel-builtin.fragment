@@ -1,0 +1,15 @@
+# Builtin changes on top of the vendor 5.4.61 #334 kernel (mk10/running-5.4.61-334.config).
+# Everything here is =y: it changes the kernel image, so it needs the boot image (p4) replaced.
+# Screens. The vendor symbols FB_TFT_GC9107 / FB_TFT_GC9307 have no Kconfig in this tree before the
+# reconstructed drivers; the GC9307 line is added by the commit that adds fb_gc9307.c.
+CONFIG_FB_TFT_GC9107=y
+# Mainline replacements for the vendor's CONFIG_CRYPTO_DEV_ATSHA204A (RNG only; the vendor's
+# /dev/atsha204a is gone, KeyboardDevice only logged its Key(11) verify)
+CONFIG_HW_RANDOM=y
+CONFIG_CRYPTO_DEV_ATMEL_SHA204A=y
+# zram swap: the vendor kernel has CONFIG_SWAP=n, so zram.ko loaded but swapon failed
+CONFIG_SWAP=y
+CONFIG_ZSMALLOC=y
+CONFIG_ZRAM=y
+# LilAlpine's /etc/init.d/zram asks for lz4; the vendor config only has lzo/deflate/zstd
+CONFIG_CRYPTO_LZ4=y
