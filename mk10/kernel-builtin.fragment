@@ -1,8 +1,9 @@
 # Builtin changes on top of the vendor 5.4.61 #334 kernel (mk10/running-5.4.61-334.config).
 # Everything here is =y: it changes the kernel image, so it needs the boot image (p4) replaced.
-# Screens. The vendor symbols FB_TFT_GC9107 / FB_TFT_GC9307 have no Kconfig in this tree before the
-# reconstructed drivers; the GC9307 line is added by the commit that adds fb_gc9307.c.
+# Screens: the reconstructed drivers (the vendor symbols had no Kconfig in this tree). Makefile order
+# decides probe order, so fb1..fb10 = the ten GC9107 keys and fb11 = the GC9307 large screen, as on the vendor kernel.
 CONFIG_FB_TFT_GC9107=y
+CONFIG_FB_TFT_GC9307=y
 # Mainline replacements for the vendor's CONFIG_CRYPTO_DEV_ATSHA204A (RNG only; the vendor's
 # /dev/atsha204a is gone, KeyboardDevice only logged its Key(11) verify)
 CONFIG_HW_RANDOM=y

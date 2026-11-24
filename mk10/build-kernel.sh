@@ -52,7 +52,7 @@ for f in "$X"/*.ko; do
   vm=vermagic=$(/sbin/modinfo -F vermagic "$f")
   [ "$vm" = "vermagic=$KVER SMP preempt mod_unload ARMv7 p2v8 " ] || { echo "bad $vm in $f"; exit 1; }
 done
-for f in "$X"/*.ko; do case $(basename "$f") in fb_gc9107*|zram*|zsmalloc*|atmel*) echo "module that must be builtin: $f"; exit 1;; esac; done
+for f in "$X"/*.ko; do case $(basename "$f") in fb_gc9107*|fb_gc9307*|zram*|zsmalloc*|atmel*) echo "module that must be builtin: $f"; exit 1;; esac; done
 cp modules.builtin modules.builtin.modinfo "$OUT/stage/lib/modules/$KVER/"
 tar -C "$OUT/stage" -czf "$OUT/mk10-modules-$KVER.tgz" lib
 
