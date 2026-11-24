@@ -24,7 +24,14 @@ make -j"$(nproc)" zImage modules >"$W/build-modules.log" 2>&1 || { tail -20 "$W/
 [ "$(cat include/config/kernel.release)" = "$KVER" ] || { echo "kernel.release != $KVER"; exit 1; }
 
 log "out-of-tree: nf_nat_masquerade (vendor nf_nat lacks it), 8821cu, 88x2bu"
-make -C "$K" M="$W/oot/nf_nat_masquerade" modules >/dev/null 2>&1
+M=$W/oot/nf_nat_masquerade; mkdir -p "$M"
+cp net/netfilter/nf_nat_masquerade.c "$M/"
+grep -q MODULE_LICENSE "$M/nf_nat_masquerade.c" || echo 'MODULE_LICENSE("GPL");' >> "$M/nf_nat_masquerade.c"
+echo "obj-m := nf_nat_masquerade.o" > "$M/Kbuild"
+make -C "$K" M="$M" modules >/dev/null 2>&1
+for d in 8821cu-20210916 88x2bu-20210702; do
+  [ -d "$W/oot/$d" ] || rsync -a --exclude "*.ko" --exclude "*.o" "$HOME/workspace/$d" "$W/oot/"
+done
 for d in 8821cu-20210916 88x2bu-20210702; do
   ( cd "$W/oot/$d"
     # driver imports the VFS namespace only for >=5.10; this vendor 5.4 enforces it too
