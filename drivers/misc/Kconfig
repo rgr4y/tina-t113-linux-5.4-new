@@ -514,4 +514,14 @@ source "drivers/misc/sunxi-bootevent/Kconfig"
 source "drivers/misc/sunxi-gorilla/Kconfig"
 source "drivers/misc/sunxi-tvutils/Kconfig"
 
+config MK10_ATSHA_COMPAT
+	tristate "MK10 /dev/atsha204a stand-in for the vendor app"
+	help
+	  The Waveshare MK10 vendor app (KeyboardDevice) refuses to start
+	  ("Check HardWare Error") unless ioctl(0x50) on /dev/atsha204a
+	  returns 0. The vendor ATSHA204A driver that provided it is not in
+	  this tree. This creates /dev/atsha204a and answers that check with
+	  0 without talking to the chip, so the mainline atmel-sha204a can
+	  keep the chip as a hwrng.
+
 endmenu

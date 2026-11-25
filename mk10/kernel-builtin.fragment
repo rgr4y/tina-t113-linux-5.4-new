@@ -4,10 +4,12 @@
 # decides probe order, so fb1..fb10 = the ten GC9107 keys and fb11 = the GC9307 large screen, as on the vendor kernel.
 CONFIG_FB_TFT_GC9107=y
 CONFIG_FB_TFT_GC9307=y
-# Mainline replacements for the vendor's CONFIG_CRYPTO_DEV_ATSHA204A (RNG only; the vendor's
-# /dev/atsha204a is gone, KeyboardDevice only logged its Key(11) verify)
+# Mainline replacements for the vendor's CONFIG_CRYPTO_DEV_ATSHA204A: the chip as a hwrng, plus a
+# /dev/atsha204a stand-in. KeyboardDevice gates startup on ioctl(0x50) there returning 0
+# (0xc7214, caller 0x31b38); without it the app shows "Check HardWare Error" on fb0 and never draws.
 CONFIG_HW_RANDOM=y
 CONFIG_CRYPTO_DEV_ATMEL_SHA204A=y
+CONFIG_MK10_ATSHA_COMPAT=y
 # zram swap: the vendor kernel has CONFIG_SWAP=n, so zram.ko loaded but swapon failed
 CONFIG_SWAP=y
 CONFIG_ZSMALLOC=y

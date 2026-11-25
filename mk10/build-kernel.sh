@@ -19,7 +19,7 @@ make olddefconfig >/dev/null
 log "guard: builtin drift vs the running kernel must be exactly the expected set"
 # expected: the drivers swapped in, zram (+ swap, lz4, deps), masquerade now builtin so no
 # out-of-tree copy, the cdc_subset sub-options, compiler symbols. Anything else stops the build.
-ALLOW='^[-+ ]?(CRYPTO_DEV_ATSHA204A|FB_TFT_GC9107|FB_TFT_GC9307|RTL8710BU|CRYPTO_DEV_ATMEL_SHA204A|CRYPTO_DEV_ATMEL_I2C|CRYPTO_LZ4|LZ4_COMPRESS|LZ4_DECOMPRESS|HW_RANDOM|SWAP|ZSMALLOC|ZRAM|CC_HAS_ASM_INLINE|NF_NAT_MASQUERADE|USB_ETH_RNDIS|USB_ARMLINUX|USB_BELKIN) '
+ALLOW='^[-+ ]?(CRYPTO_DEV_ATSHA204A|FB_TFT_GC9107|FB_TFT_GC9307|RTL8710BU|CRYPTO_DEV_ATMEL_SHA204A|CRYPTO_DEV_ATMEL_I2C|MK10_ATSHA_COMPAT|CRYPTO_LZ4|LZ4_COMPRESS|LZ4_DECOMPRESS|HW_RANDOM|SWAP|ZSMALLOC|ZRAM|CC_HAS_ASM_INLINE|NF_NAT_MASQUERADE|USB_ETH_RNDIS|USB_ARMLINUX|USB_BELKIN) '
 drift=$(scripts/diffconfig mk10/running-5.4.61-334.config .config | grep -E ' y$|-> y' | grep -vE "$ALLOW" || true)
 [ -z "$drift" ] || { echo "unexpected builtin drift, refusing:"; echo "$drift"; exit 1; }
 scripts/diffconfig mk10/running-5.4.61-334.config .config | grep -E 'y$|-> y' | sed 's/^/  drift: /'
